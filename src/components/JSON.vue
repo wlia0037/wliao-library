@@ -1,18 +1,23 @@
 <!-- JSONLab.vue -->
 <template>
   <div class="json-lab">
-    <h1>🗄️ JSON Data & Vue Directives Lab</h1>
+    <h1> JSON Data & Vue Directives Lab</h1>
 
     <section class="lab-section">
-      <h2>📚 Working with JSON Arrays</h2>
+      <h2> Working with JSON Arrays</h2>
       <p>Our <code>authors.json</code> contains an array of author objects.</p>
 
       <h3>Iterating through Arrays</h3>
       <!-- Activity 6: Render a list containing author names and their birth years. Hint: Make use of the v-for directive to iterate through the array of authors. -->
       <ul>
-        <li v-for="author in authors" :key="author.id">
+        <li
+          v-for="author in authors"
+          :key="author.id"
+          :class="{ highlight: author.name === 'George Orwell' }"
+        >
           {{ author.name }} ({{ author.birthYear }})
         </li>
+
       </ul>
 
       
@@ -98,6 +103,7 @@
 <script setup>
 import { ref, computed } from "vue"
 
+
 // Activity 1: Import JSON files (authors.json and bookstores.json)
 // TODO: CODE TO IMPORT JSON FILES HERE
 import authors from "../assets/json/authors.json";
@@ -133,10 +139,11 @@ const austen = computed(() => {
   max-width: 80vw;
   margin: 0 auto;
   padding: 20px;
-  background-color: #ffffff; /* 改为白色背景 */
-  color: #333333;             /* 添加文字颜色为深灰色 */
+  background-color: #42b883; 
+  color: white;             
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-weight: bold;
 }
 
 h1,
@@ -150,7 +157,7 @@ h1 {
 
 .lab-section {
   background-color: #ffffff;
-  color: #333333; /* 添加这一行 */
+  color: #333333; 
   padding: 20px;
   margin-bottom: 20px;
   border-radius: 8px;
