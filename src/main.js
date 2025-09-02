@@ -11,6 +11,8 @@ import Aura from '@primevue/themes/aura'
 import DataTable from 'primevue/datatable'
 import Column from 'primevue/column'
 
+import router from './router'
+
 const app = createApp(App)
 
 app.use(PrimeVue, {
@@ -25,5 +27,7 @@ app.use(PrimeVue, {
 
 app.component('DataTable', DataTable)
 app.component('Column', Column)
+
+app.use(router)
 
 app.mount('#app')

@@ -1,15 +1,14 @@
-<script setup>
-import JSONLab from './components/JSON.vue'
-import Form from './components/Form.vue'
-</script>
-
+<!-- src/App.vue -->
 <template>
-  <main>
-    <!--<JSONLab />-->
-    <Form />
-  </main>
+  <div>
+    <BHeader />
+    <router-view></router-view>
+  </div>
 </template>
 
+<script setup>
+import BHeader from './components/BHeader.vue'
+</script>
 
 <style scoped>
 header {

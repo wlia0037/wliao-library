@@ -2,7 +2,6 @@
   <div class="container py-4">
     <h1 class="display-5 mb-4 text-center">User Information Form</h1>
 
-    <!-- Form -->
     <div class="card shadow-sm mb-4">
       <div class="card-body">
         <form @submit.prevent="onSubmit" @reset="onReset" novalidate>
@@ -13,7 +12,7 @@
               id="username"
               type="text"
               class="form-control"
-              v-model.trim="form.username"
+              v-model.trim="formData.username"
               :class="{ 'is-invalid': submitted && errors.username }"
               placeholder="Enter your username"
             />
@@ -29,7 +28,7 @@
               id="password"
               type="password"
               class="form-control"
-              v-model="form.password"
+              v-model="formData.password"
               :class="{ 'is-invalid': submitted && errors.password }"
               placeholder="At least 8 characters"
             />
@@ -38,18 +37,24 @@
             </div>
           </div>
 
+          <!-- Confirm Password (exactly following the Specification style for field + blur) -->
+          
+
           <!-- Resident -->
-          <div class="form-check mb-3">
+          <div class="mb-3">
+            <label for="confirm-password" class="form-label">Confirm password</label>
             <input
-              id="resident"
-              type="checkbox"
-              class="form-check-input"
-              v-model="form.isResident"
+              type="password"
+              class="form-control"
+              id="confirm-password"
+              v-model="formData.confirmPassword"
+              @blur="() => validateConfirmPassword(true)"
             />
-            <label class="form-check-label" for="resident">
-              Australian Resident?
-            </label>
+            <div v-if="errors.confirmPassword" class="text-danger">
+              {{ errors.confirmPassword }}
+            </div>
           </div>
+
 
           <!-- Reason -->
           <div class="mb-3">
@@ -58,7 +63,7 @@
               id="reason"
               class="form-control"
               rows="3"
-              v-model.trim="form.reason"
+              v-model.trim="formData.reason"
               :class="{ 'is-invalid': submitted && errors.reason }"
               placeholder="Tell us a short reason (min 10 chars)"
             ></textarea>
@@ -73,7 +78,7 @@
             <select
               id="gender"
               class="form-select"
-              v-model="form.gender"
+              v-model="formData.gender"
               :class="{ 'is-invalid': submitted && errors.gender }"
             >
               <option disabled value="">Select...</option>
@@ -94,38 +99,19 @@
       </div>
     </div>
 
-    <!-- DataTable -->
+    <!-- Simple submitted list (kept minimal) -->
     <div v-if="users.length" class="card shadow-sm">
       <div class="card-body">
         <h5 class="card-title mb-3">Submitted Users</h5>
-        <DataTable :value="users" dataKey="id" tableStyle="min-width: 50rem">
+        <DataTable :value="users" dataKey="id">
           <Column field="username" header="Username" />
           <Column header="Gender">
-            <template #body="slotProps">
-              {{ formatGender(slotProps.data.gender) }}
-            </template>
+            <template #body="s">{{ s.data.gender }}</template>
           </Column>
           <Column header="Resident">
-            <template #body="slotProps">
-              {{ slotProps.data.isResident ? 'Yes' : 'No' }}
-            </template>
+            <template #body="s">{{ s.data.isAustralian ? 'Yes' : 'No' }}</template>
           </Column>
           <Column field="reason" header="Reason" />
-          <Column header="Password">
-            <template #body="slotProps">
-              {{ maskPassword(slotProps.data.password) }}
-            </template>
-          </Column>
-          <Column header="Actions" style="width: 8rem">
-            <template #body="slotProps">
-              <button
-                class="btn btn-sm btn-outline-danger"
-                @click="removeRow(slotProps.data)"
-              >
-                Delete
-              </button>
-            </template>
-          </Column>
         </DataTable>
       </div>
     </div>
@@ -133,59 +119,94 @@
 </template>
 
 <script setup>
-import { reactive, ref } from 'vue'
+import { ref } from 'vue'
 
-const form = reactive({
+/* Use the Specification's data shape and names */
+const formData = ref({
   username: '',
   password: '',
-  isResident: false,
+  confirmPassword: '',
+  isAustralian: false,
   reason: '',
   gender: ''
 })
 
+/* Use the Specification's error object keys */
+const errors = ref({
+  username: null,
+  password: null,
+  confirmPassword: null,
+  resident: null,
+  gender: null,
+  reason: null
+})
+
 const users = ref([])
 const submitted = ref(false)
-const errors = reactive({})
 
-function validate () {
-  Object.keys(errors).forEach(k => delete errors[k])
-
-  if (!form.username) {
-    errors.username = 'Username is required'
-  } else if (form.username.length < 3 || form.username.length > 20) {
-    errors.username = 'Username must be 3-20 characters'
+/* Exactly the Specification's confirm-password validator */
+const validateConfirmPassword = (blur) => {
+  if (formData.value.password !== formData.value.confirmPassword) {
+    if (blur) errors.value.confirmPassword = 'Passwords do not match.'
+  } else {
+    errors.value.confirmPassword = null
   }
-
-  if (!form.password) {
-    errors.password = 'Password is required'
-  } else if (form.password.length < 8) {
-    errors.password = 'Password must be at least 8 characters'
-  }
-
-  if (!form.reason) {
-    errors.reason = 'Reason is required'
-  } else if (form.reason.length < 10) {
-    errors.reason = 'Reason must be at least 10 characters'
-  }
-
-  if (!form.gender) {
-    errors.gender = 'Please select a gender'
-  }
-
-  return Object.keys(errors).length === 0
 }
 
+/* Beginner-friendly overall validation to keep the form safe */
+function validateAll () {
+  errors.value.username = null
+  errors.value.password = null
+  errors.value.reason = null
+  errors.value.gender = null
+  // keep any confirmPassword message that blur may have set
+  // also enforce a submit-time safety check
+  if (!formData.value.username) {
+    errors.value.username = 'Username is required'
+  } else if (formData.value.username.length < 3) {
+    errors.value.username = 'Min 3 characters'
+  }
+
+  if (!formData.value.password) {
+    errors.value.password = 'Password is required'
+  } else if (formData.value.password.length < 8) {
+    errors.value.password = 'At least 8 characters'
+  }
+
+  if (formData.value.password !== formData.value.confirmPassword) {
+    errors.value.confirmPassword = 'Passwords do not match.'
+  }
+
+  if (!formData.value.reason) {
+    errors.value.reason = 'Reason is required'
+  } else if (formData.value.reason.length < 10) {
+    errors.value.reason = 'At least 10 characters'
+  }
+
+  if (!formData.value.gender) {
+    errors.value.gender = 'Please select a gender'
+  }
+
+  return !(
+    errors.value.username ||
+    errors.value.password ||
+    errors.value.confirmPassword ||
+    errors.value.reason ||
+    errors.value.gender
+  )
+}
+
+/* Simple submit/reset handlers */
 function onSubmit () {
   submitted.value = true
-  if (!validate()) return
+  if (!validateAll()) return
 
   users.value.push({
-    id: cryptoRandomId(),
-    username: form.username,
-    password: form.password,
-    isResident: form.isResident,
-    reason: form.reason,
-    gender: form.gender
+    id: Date.now().toString(),
+    username: formData.value.username,
+    isAustralian: formData.value.isAustralian,
+    reason: formData.value.reason,
+    gender: formData.value.gender
   })
 
   onReset()
@@ -193,32 +214,17 @@ function onSubmit () {
 }
 
 function onReset () {
-  form.username = ''
-  form.password = ''
-  form.isResident = false
-  form.reason = ''
-  form.gender = ''
-}
-
-function removeRow (row) {
-  users.value = users.value.filter(u => u.id !== row.id)
-}
-
-function formatGender (g) {
-  return g ? g.charAt(0).toUpperCase() + g.slice(1) : ''
-}
-
-function maskPassword (pwd) {
-  return '•'.repeat(Math.min(pwd?.length || 0, 12))
-}
-
-function cryptoRandomId () {
-  if (typeof crypto !== 'undefined' && crypto.getRandomValues) {
-    const arr = new Uint32Array(2)
-    crypto.getRandomValues(arr)
-    return `${arr[0].toString(16)}${arr[1].toString(16)}`
-  }
-  return Math.random().toString(36).slice(2)
+  formData.value.username = ''
+  formData.value.password = ''
+  formData.value.confirmPassword = ''
+  formData.value.isAustralian = false
+  formData.value.reason = ''
+  formData.value.gender = ''
+  errors.value.username = null
+  errors.value.password = null
+  errors.value.confirmPassword = null
+  errors.value.reason = null
+  errors.value.gender = null
 }
 </script>
 
