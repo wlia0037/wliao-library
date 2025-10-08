@@ -13,14 +13,15 @@ const routes = [
   { path: "/FireLogin", name: "FireLogin", component: FirebaseSigninView },
   { path: "/FireRegister", name: "FireRegister", component: FirebaseRegisterView },
 
-  // Demo routes for role-based access (reuse HomeView to avoid extra files)
   { path: "/admin", name: "Admin", component: HomeView, meta: { requiresAuth: true, roles: ["admin"] } },
   { path: "/member", name: "Member", component: HomeView, meta: { requiresAuth: true, roles: ["member", "admin"] } },
 
-  // Fallback when user lacks permission
   { path: "/not-authorized", name: "NoAuth", component: HomeView },
 
-  { path: "/logout", name: "Logout", component: () => import("@/views/LogoutView.vue") }
+  { path: "/logout", name: "Logout", component: () => import("@/views/LogoutView.vue") },
+
+  // Week 8 Add Book page
+  { path: "/addbook", name: "AddBook", component: () => import("@/views/AddBookView.vue"), meta: { requiresAuth: true } }
 ];
 
 const router = createRouter({
@@ -28,26 +29,23 @@ const router = createRouter({
   routes
 });
 
-// Route guard: read role from Firestore and check meta.roles
+// auth + role guard
 router.beforeEach(async (to, from, next) => {
-  if (!to.meta?.requiresAuth) return next();
-
   const auth = getAuth();
   const user = auth.currentUser;
-  if (!user) return next({ name: "FireLogin" });
+
+  if (to.meta?.requiresAuth && !user) return next({ name: "FireLogin" });
+
+  if (!to.meta?.roles) return next();
 
   try {
     const db = getFirestore();
     const snap = await getDoc(doc(db, "users", user.uid));
     const role = snap.exists() ? (snap.data().role || "member") : "member";
-
-    // Log for rubric screenshot
     console.log("Router check → uid:", user.uid, "role:", role);
 
     const allowed = Array.isArray(to.meta.roles) ? to.meta.roles.includes(role) : true;
-    if (!allowed) return next({ name: "NoAuth" });
-
-    return next();
+    return allowed ? next() : next({ name: "NoAuth" });
   } catch (e) {
     console.error("Role check failed:", e);
     return next({ name: "NoAuth" });

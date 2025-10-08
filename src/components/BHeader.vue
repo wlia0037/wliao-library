@@ -12,7 +12,6 @@
             About
           </router-link>
         </li>
-
         <li class="nav-item">
           <router-link to="/FireLogin" class="nav-link" active-class="active">
             Firebase Login
@@ -23,11 +22,14 @@
             Firebase Register
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link to="/addbook" class="nav-link" active-class="active">
+            Add Book
+          </router-link>
+        </li>
       </ul>
     </header>
   </div>
 </template>
 
-<script setup>
-
-</script>
+<script setup></script>
