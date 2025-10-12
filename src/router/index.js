@@ -8,6 +8,7 @@ import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
 import GetBookCountView from "@/views/GetBookCountView.vue";
+import CountBookAPI from "@/views/CountBookAPI.vue";
 
 const routes = [
   { path: "/", name: "Home", component: HomeView },
@@ -26,6 +27,8 @@ const routes = [
   { path: "/addbook", name: "AddBook", component: () => import("@/views/AddBookView.vue"), meta: { requiresAuth: true } },
 
   { path: "/get-book-count", name: "GetBookCount", component: GetBookCountView },
+
+  { path: "/CountBookAPI", name: "CountBookAPI", component: CountBookAPI },
 
   // Week 10: Weather – per spec: name GetWeather, url /WeatherCheck
   { path: "/WeatherCheck", name: "GetWeather", component: () => import("@/views/WeatherView.vue") },

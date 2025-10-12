@@ -1,13 +1,18 @@
-<!-- src/App.vue -->
 <template>
   <div>
-    <BHeader />
+    <BHeader v-if="showHeader" />
     <router-view></router-view>
   </div>
 </template>
 
 <script setup>
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 import BHeader from "./components/BHeader.vue";
+
+const route = useRoute();
+// Hide header on the API page so only raw JSON shows
+const showHeader = computed(() => route.name !== "CountBookAPI");
 </script>
 
 <style scoped>
