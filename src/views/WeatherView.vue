@@ -14,19 +14,22 @@
 
     <div v-if="loading" class="italic">Loading...</div>
     <div v-if="error" class="text-red-600">{{ error }}</div>
-    <div v-if="weather" class="p-4 rounded border shadow">
-      <p class="mb-1"><strong>City:</strong> {{ weather.name }}</p>
-      <p class="mb-1"><strong>Temp:</strong> {{ Math.round(weather.main.temp) }}°C</p>
-      <p><strong>Desc:</strong> {{ weather.weather?.[0]?.description }}</p>
+    <div v-if="weather" class="p-4 rounded border shadow flex items-center gap-4">
+      <img v-if="iconUrl" :src="iconUrl" :alt="weather.weather?.[0]?.description" width="64" height="64" />
+      <div>
+        <p class="mb-1"><strong>City:</strong> {{ weather.name }}</p>
+        <p class="mb-1"><strong>Temp:</strong> {{ Math.round(weather.main.temp) }}°C</p>
+        <p><strong>Desc:</strong> {{ weather.weather?.[0]?.description }}</p>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, computed } from "vue";
 import axios from "axios";
 
-const city = ref("");
+const city = ref("Clayton, AU");
 const loading = ref(false);
 const error = ref("");
 const weather = ref(null);
@@ -46,8 +49,13 @@ async function searchByCity() {
   } finally {
     loading.value = false;
   }
-
 }
+
+// Weather icon URL from OpenWeather response
+const iconUrl = computed(() => {
+  const code = weather.value?.weather?.[0]?.icon;
+  return code ? `https://openweathermap.org/img/wn/${code}@2x.png` : "";
+});
 </script>
 
 <style scoped>

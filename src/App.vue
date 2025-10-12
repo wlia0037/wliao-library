@@ -12,7 +12,7 @@ import BHeader from "./components/BHeader.vue";
 
 const route = useRoute();
 // Hide header on the API page so only raw JSON shows
-const showHeader = computed(() => route.name !== "CountBookAPI");
+const showHeader = computed(() => !["CountBookAPI", "GetAllBookAPI"].includes(route.name));
 </script>
 
 <style scoped>
