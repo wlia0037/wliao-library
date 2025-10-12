@@ -2,7 +2,6 @@
   <div class="p-6 max-w-xl mx-auto">
     <h1 class="text-2xl font-bold mb-4">Weather Check</h1>
 
-    <!-- text field + button per spec -->
     <div class="flex gap-2 mb-4">
       <input
         v-model="city"
@@ -13,7 +12,6 @@
       <button class="border rounded px-4 py-2" @click="searchByCity">Search</button>
     </div>
 
-    <!-- simple area to show current weather -->
     <div v-if="loading" class="italic">Loading...</div>
     <div v-if="error" class="text-red-600">{{ error }}</div>
     <div v-if="weather" class="p-4 rounded border shadow">
@@ -28,17 +26,17 @@
 import { ref } from "vue";
 import axios from "axios";
 
-const city = ref("");           // v-model target
+const city = ref("");
 const loading = ref(false);
 const error = ref("");
 const weather = ref(null);
 
-// Use OpenWeatherMap Current Weather API with city name
+// Simple GET to Current Weather API
 async function searchByCity() {
   if (!city.value.trim()) return;
   loading.value = true; error.value = ""; weather.value = null;
   try {
-    const apiKey = import.meta.env.VITE_OWM_API_KEY; // keep key in .env
+    const apiKey = import.meta.env.VITE_OWM_API_KEY;
     const { data } = await axios.get("https://api.openweathermap.org/data/2.5/weather", {
       params: { q: city.value.trim(), appid: apiKey, units: "metric" },
     });
@@ -48,9 +46,10 @@ async function searchByCity() {
   } finally {
     loading.value = false;
   }
+
 }
 </script>
 
 <style scoped>
-/* minimal styles; Tailwind handles most */
+/* minimal styles */
 </style>
