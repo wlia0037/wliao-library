@@ -4,7 +4,7 @@
       <ul class="nav nav-pills">
         <li class="nav-item">
           <router-link to="/" class="nav-link" active-class="active" aria-current="page">
-            Home (Week 5)
+            Home
           </router-link>
         </li>
         <li class="nav-item">
@@ -27,9 +27,22 @@
             Add Book
           </router-link>
         </li>
+        <li class="nav-item">
+          <router-link to="/get-book-count" class="nav-link" active-class="active">
+            Get Book Count
+          </router-link>
+        </li>
+
+        <li class="nav-item">
+          <router-link to="/WeatherCheck" class="nav-link" active-class="active">
+            Get Weather
+          </router-link>
+        </li>
       </ul>
     </header>
   </div>
 </template>
 
-<script setup></script>
+<script setup>
+// no script logic needed
+</script>

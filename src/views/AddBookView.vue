@@ -25,7 +25,10 @@
         />
       </div>
 
-      <button type="submit" class="border px-4 py-2 bg-blue-500 text-white rounded">
+      <button
+        type="submit"
+        class="border px-4 py-2 bg-blue-500 text-white rounded"
+      >
         Add Book
       </button>
 
@@ -33,6 +36,9 @@
       <p v-if="error" class="text-red-600">{{ error }}</p>
     </form>
   </div>
+
+
+  <BookList />
 </template>
 
 <script setup>
@@ -41,6 +47,7 @@ import { useRouter } from "vue-router";
 import { getAuth } from "firebase/auth";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import db from "@/Firebase/init";
+import BookList from "@/components/BookList.vue"; 
 
 const router = useRouter();
 const auth = getAuth();
@@ -72,7 +79,7 @@ const addBook = async () => {
       isbn: n,
       name: name.value,
       createdAt: serverTimestamp(),
-      uid: auth.currentUser.uid
+      uid: auth.currentUser.uid,
     });
     msg.value = "Book added successfully.";
     isbn.value = "";

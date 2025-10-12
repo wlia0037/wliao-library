@@ -7,6 +7,8 @@ import FirebaseRegisterView from "@/views/FirebaseRegisterView.vue";
 import { getAuth } from "firebase/auth";
 import { getFirestore, doc, getDoc } from "firebase/firestore";
 
+import GetBookCountView from '@/views/GetBookCountView.vue';
+
 const routes = [
   { path: "/", name: "Home", component: HomeView },
   { path: "/about", name: "About", component: AboutView },
@@ -21,7 +23,13 @@ const routes = [
   { path: "/logout", name: "Logout", component: () => import("@/views/LogoutView.vue") },
 
   // Week 8 Add Book page
-  { path: "/addbook", name: "AddBook", component: () => import("@/views/AddBookView.vue"), meta: { requiresAuth: true } }
+  { path: "/addbook", name: "AddBook", component: () => import("@/views/AddBookView.vue"), meta: { requiresAuth: true } },
+
+  { path: '/get-book-count', name: 'GetBookCount', component: GetBookCountView },
+
+  { path: "/weather", name: "weather", component: () => import("@/views/WeatherView.vue") }
+
+
 ];
 
 const router = createRouter({
